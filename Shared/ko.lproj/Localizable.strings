@@ -1,0 +1,62 @@
+/* Korean. Draft translations; have a native speaker check tone before sharing. */
+
+/* Home Screen and Today View widget */
+"Your Setlog group" = "내 셋로그 그룹";
+"See your friends' latest moment, heart it, and nudge whoever hasn't logged this hour." = "친구들의 최신 순간을 보고, 하트를 보내고, 아직 기록하지 않은 친구를 콕 찔러 보세요.";
+"Open Setlog to set up your group." = "셋로그를 열어 그룹을 만들어 주세요.";
+"%lld/%lld in" = "%lld/%lld명";
+"%@ · %lld/%lld logged" = "%@ · %lld/%lld명 기록";
+"Log in" = "기록까지";
+"Next in" = "다음까지";
+"Everyone's in" = "모두 기록 완료";
+"Log %@" = "%@ 기록하기";
+"Nudge %lld" = "%lld명 콕 찌르기";
+"Nudged %lld" = "%lld명 콕 찔렀어요";
+"Today in %lld logs" = "오늘의 기록 %lld개";
+"Watch today's vlog" = "오늘의 브이로그 보기";
+
+/* Lock Screen widget */
+"This hour" = "이번 시간";
+"How many friends logged this hour, and how long you have left." = "이번 시간에 기록한 친구 수와 남은 시간을 보여줘요.";
+"%@ posted · %lld/%lld in" = "%@ 기록 · %lld/%lld명";
+"%@ posted" = "%@ 기록";
+"Setlog · %@" = "셋로그 · %@";
+"%@ · you + %lld logged" = "%@ · 나 + %lld명 기록";
+"to next log" = "후 다음 기록";
+"left to log" = "남음";
+
+/* Demo group */
+"Roommates" = "룸메들";
+"You" = "나";
+"Someone" = "누군가";
+"Mina" = "민아";
+"Jae" = "재윤";
+"Sora" = "소라";
+"Alex" = "지우";
+
+/* Demo captions */
+"ramen break 🍜" = "라면 타임 🍜";
+"snack time 🍪" = "스낵타임 굿 🍪";
+"library grind 📚" = "도서관 존버 📚";
+"golden hour ☀️" = "노을 맛집 ☀️";
+"walking the dog 🐶" = "강아지 산책 🐶";
+"on my way home 🚶" = "집 가는 중 🚶";
+"coffee run ☕️" = "커피 수혈 ☕️";
+"leg day 💪" = "하체 데이 💪";
+"hiii~ 👋" = "하이룽~ 👋";
+"plant check 🌿" = "식물 물주기 🌿";
+"sunset run 🌇" = "노을 러닝 🌇";
+"nap time 😴" = "낮잠 타임 😴";
+"studio time 🎧" = "작업 중 🎧";
+"late lunch 🥪" = "늦은 점심 🥪";
+"rainy window 🌧️" = "비 오는 창가 🌧️";
+"game night 🎮" = "게임 나잇 🎮";
+
+/* Placeholder app */
+"Concept prototype · demo friends" = "콘셉트 프로토타입 · 데모 친구";
+"Add the Setlog widget from your Home Screen" = "홈 화면에서 셋로그 위젯을 추가하세요";
+"Long-press the Home Screen, tap Edit, then Add Widget, and choose Setlog Concept. Lock Screen widgets are under This hour." = "홈 화면을 길게 누르고 편집 > 위젯 추가에서 Setlog Concept을 선택하세요. 잠금 화면 위젯은 '이번 시간'에 있어요.";
+"Restart demo" = "데모 다시 시작";
+"Demo restarted" = "데모를 다시 시작했어요";
+"Preview tonight's recap" = "오늘 밤 리캡 미리 보기";
+"Back to the live feed" = "실시간 피드로 돌아가기";
