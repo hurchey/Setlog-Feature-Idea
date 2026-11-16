@@ -14,6 +14,16 @@
 "Nudged %lld" = "%lld명 콕 찔렀어요";
 "Today in %lld logs" = "오늘의 기록 %lld개";
 "Watch today's vlog" = "오늘의 브이로그 보기";
+"No logs yet today" = "오늘은 아직 기록이 없어요";
+
+/* Small Moments and Friend widgets */
+"Moments" = "순간들";
+"Loop through everyone's moments today." = "오늘 모두의 순간들을 차례로 보여줘요.";
+"Friend 1" = "친구 1";
+"Friend 2" = "친구 2";
+"Friend 3" = "친구 3";
+"Friend 4" = "친구 4";
+"One friend's moments today, on a loop. Stack the Friend widgets to swipe between friends." = "한 친구의 오늘 순간들을 차례로 보여줘요. 친구 위젯들을 쌓으면 넘겨 가며 볼 수 있어요.";
 
 /* Lock Screen widget */
 "This hour" = "이번 시간";

@@ -34,6 +34,9 @@ targets:
       path: Config/SetlogConcept-Info.plist
       properties:
         CFBundleDisplayName: Setlog Concept
+        UIAppFonts:
+          - Gaegu-Regular.ttf
+          - Gaegu-Bold.ttf
         UILaunchScreen: {}
         UIApplicationSceneManifest:
           UIApplicationSupportsMultipleScenes: true
@@ -68,6 +71,9 @@ targets:
       path: Config/SetlogWidgets-Info.plist
       properties:
         CFBundleDisplayName: Setlog Widgets
+        UIAppFonts:
+          - Gaegu-Regular.ttf
+          - Gaegu-Bold.ttf
         NSExtension:
           NSExtensionPointIdentifier: com.apple.widgetkit-extension
     entitlements:

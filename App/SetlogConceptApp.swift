@@ -2,7 +2,7 @@ import SwiftUI
 import WidgetKit
 
 /// iOS only ships widgets inside an app. In production that app is Setlog itself;
-/// here it's a placeholder that never appears in the demo.
+/// here it's a placeholder.
 @main
 struct SetlogConceptApp: App {
     var body: some Scene {
@@ -33,7 +33,7 @@ struct PlaceholderScreen: View {
 
             ConceptTag()
 
-            // Off-camera prep: restart clears the demo so friends start posting again from the top;
+            // Restart clears the demo so friends start posting again from the top;
             // the recap switch shows the large widget's end-of-day page without waiting for 22:00.
             VStack(spacing: 10) {
                 Button(restarted ? "Demo restarted" : "Restart demo") {
@@ -45,9 +45,7 @@ struct PlaceholderScreen: View {
                 .disabled(restarted)
 
                 Button(previewingRecap ? "Back to the live feed" : "Preview tonight's recap") {
-                    var state = Store.loadCurrent()
-                    state.previewRecap.toggle()
-                    Store.save(state)
+                    let state = Store.update { $0.previewRecap.toggle() }
                     WidgetCenter.shared.reloadAllTimelines()
                     previewingRecap = state.previewRecap
                 }

@@ -2,12 +2,12 @@
 
 A concept by Eric Hurchey. Not affiliated with or endorsed by newchat. The group, friends, and their posts are demo data, and the doodles are original drawings made in Setlog's spirit.
 
-**The idea:** Setlog's habit is many short opens a day. In Korea, users open it 14 to 15 times a day for under a minute each. Every one of those opens could start from the Home Screen, Today View, or Lock Screen. These widgets turn the hourly prompt into something your friends' activity pulls you into: you see who just posted, how many of the group logged this hour, and how long you have left, and you can react or nudge friends without opening the app.
+**The idea:** Setlog runs on quick check-ins: did my friends post this hour, and how long do I have left to log? Today, each answer means opening the app. These widgets answer at a glance from the Home Screen, Today View, and Lock Screen, and make your friends' posts the reason to log. You see who just posted and how many of the group are in, and you can react or nudge friends without opening the app.
 
 ## What's in it
 
 **Home Screen widget**
-- **Small:** your friends' latest moment as a full-bleed Setlog card: name, the hour on a 24-hour clock ("17:00"), their caption, and a trail of reactions. A pill shows how many logged this hour.
+- **Small (Friend 1–4 and Moments):** a loop of today's moments, newest first, each as a full-bleed Setlog card: name, the hour on a 24-hour clock ("17:00"), their caption, and a trail of reactions. The next moment fades in every 30 seconds, and a new post jumps to the front. **Friend 1** to **Friend 4** each loop through one friend's moments, in the order they appear in the group; stack them and swipe up or down to go from friend to friend. **Moments** loops through everyone's on its own. A pill shows how many logged this hour.
 - **Medium:** the two latest moments as tilted, stacked cards. Beside them: the group, the hour's count, a countdown, today's 24-hour bar, and a **Nudge** button showing who hasn't logged.
 
 **Today View widget** (swipe right from the Lock Screen or Home Screen)
@@ -26,13 +26,14 @@ A concept by Eric Hurchey. Not affiliated with or endorsed by newchat. The group
 
 **Design details**
 - Setlog's look: warm paper background, white-bordered photo cards, the hour in a wide heavy face, white pills, and their purple, pink, and flame colors.
-- Original hand-drawn doodles that react to the hour: sparkles on the group name, an envelope on Nudge, flames once 3 or more have logged, a smiling star when it's your turn, and a moon late at night.
+- A hand-drawn finish like Setlog's site: handwritten text in [Gaegu](https://fonts.google.com/specimen/Gaegu) (Latin and Hangul, bundled under the SIL Open Font License in `Shared/Fonts`), wobbly ink outlines on cards and pills, and a pink hand-drawn frame.
+- Original doodles that react to the hour: sparkles on the group name, an envelope on Nudge, flames once 3 or more have logged, a smiling star when it's your turn, and a moon late at night. A heart and a puppy are stuck on the cards like stickers.
 - Animations: counts roll and new posts slide onto the stack when a friend posts.
 - Dark mode with a warm charcoal palette, and tinted Home Screens (photos turn grayscale instead of a flat tint).
 - Korean throughout, including the demo group (룸메들) and captions like "스낵타임 굿 🍪". The translations are drafts for a native speaker to check.
 
 **Placeholder app**
-iOS only ships widgets inside an app. In production that app is Setlog itself, so here it's a single screen that never appears in the demo. It has two off-camera buttons: **Restart demo** and **Preview tonight's recap**.
+iOS only ships widgets inside an app. In production that app is Setlog itself, so here it's a single screen with two buttons for trying the widgets: **Restart demo** and **Preview tonight's recap**.
 
 ## What's real and what's mocked
 
@@ -55,18 +56,11 @@ Requirements: a Mac with Xcode and an iOS Simulator runtime. Deployment target i
 
 The App Group (`group.com.example.setlogconcept`) works as-is in the Simulator. To run on a device, change it in `project.yml` and `Shared/Store.swift` (`appGroupID`) to one registered to your team, and set your team under Signing & Capabilities.
 
-## Demo flow
+### Try it
 
-1. Run the app and tap **Restart demo** before each take.
-2. Add the widgets. **Home Screen:** long-press, Edit, Add Widget, Setlog Concept, then add the small and medium sizes. **Today View:** swipe right, Edit, and add the large size. **Lock Screen:** long-press the Lock Screen, Customize, and add the **This hour** widgets.
+1. In the app, tap **Restart demo** to start the hour over with fresh posts.
+2. Add the widgets. **Home Screen:** long-press, Edit, Add Widget, Setlog Concept, then add the medium **Your Setlog group** and the small **Friend 1** to **Friend 4**. Drag the Friend widgets onto each other to stack them. **Today View:** swipe right, Edit, and add the large size. **Lock Screen:** long-press the Lock Screen, Customize, and add the **This hour** widgets.
 3. Watch friends post. Mina has already logged. Jae, Sora, and Alex follow every 30 seconds, the stack updates, flames appear at 3/5, and the star and **Log** button appear once everyone else is in.
 4. Tap a card's ❤️ and tap **Nudge**.
 5. For the recap, tap **Preview tonight's recap** in the app (or wait until 22:00).
 6. For Korean, set the device language to Korean, then tap **Restart demo** so the demo group is created in Korean.
-
-## Talking points for production
-
-- **Live updates:** a silent push reloads the widgets when a friend posts, so the stack and "Mina posted · 2 min" are always current.
-- **Nudges** become pushes to the friends who haven't logged, rate-limited so they feel friendly.
-- **The recap** becomes a shareable vlog of the day's clips, stitched on the server.
-- **The metric it moves:** opens per day, and the share of opens that start from the Home Screen, Today View, and Lock Screen.

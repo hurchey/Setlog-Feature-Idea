@@ -11,10 +11,6 @@ enum Store {
     /// under Signing & Capabilities > App Groups.
     static let appGroupID = "group.com.example.setlogconcept"
 
-    static var isShared: Bool {
-        FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroupID) != nil
-    }
-
     static var root: URL {
         let base = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroupID)
             ?? FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
@@ -38,7 +34,7 @@ enum Store {
         return try? JSONDecoder().decode(GroupState.self, from: data)
     }
 
-    static func save(_ state: GroupState) {
+    private static func save(_ state: GroupState) {
         guard let data = try? JSONEncoder().encode(state) else { return }
         try? data.write(to: stateFile, options: .atomic)
     }
@@ -46,18 +42,22 @@ enum Store {
     /// Seconds between scripted friend posts.
     static let demoPostInterval: TimeInterval = 30
 
-    /// The Home Screen and Lock Screen widgets can reload at the same moment.
+    /// Widget reloads and widget button taps run in the same extension process, so holding this
+    /// across read, change, and write keeps a reload from saving over a tap. The app's demo
+    /// buttons run in their own process and aren't covered.
     private static let lock = NSLock()
 
-    /// Loads the group as of `now`: creates the demo group the first time, releases scripted
-    /// posts that are due, and schedules this hour's scripted posts.
-    static func loadCurrent(now: Date = Date()) -> GroupState {
+    /// Brings the group up to date as of `now` (creating the demo group the first time, releasing
+    /// scripted posts that are due, scheduling this hour's), applies `change`, and saves it.
+    @discardableResult
+    static func update(now: Date = Date(), _ change: (inout GroupState) -> Void = { _ in }) -> GroupState {
         lock.lock()
         defer { lock.unlock() }
         var state = load() ?? seed(now: now)
         state.dropOldMoments(now: now)
         state.releaseDuePosts(now: now)
         scheduleDemoPosts(&state, now: now)
+        change(&state)
         save(state)
         return state
     }

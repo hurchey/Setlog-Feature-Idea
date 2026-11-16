@@ -4,11 +4,14 @@ import SwiftUI
 /// slight wobble and one soft fill. These are original drawings, not copies of newchat's artwork.
 struct Doodle: View {
     enum Kind {
-        case sparkle, flame, star, envelope, moon
+        case sparkle, flame, star, envelope, moon, heart, puppy
     }
 
     let kind: Kind
     var size: CGFloat = 20
+    /// Outlines only, in the primary color. The Lock Screen draws widgets in a single tint,
+    /// where fills would turn into solid blobs.
+    var lineArt = false
 
     var body: some View {
         content
@@ -29,23 +32,37 @@ struct Doodle: View {
             ZStack {
                 inked(StarShape(), fill: Palette.butter)
                 FaceShape(eyes: [CGPoint(x: 0.42, y: 0.52), CGPoint(x: 0.58, y: 0.52)], mouth: CGPoint(x: 0.5, y: 0.63))
-                    .stroke(Palette.outline, style: featureLine)
+                    .stroke(ink, style: featureLine)
             }
         case .envelope:
             ZStack {
                 inked(EnvelopeShape(), fill: .white)
-                EnvelopeFlapShape().stroke(Palette.outline, style: outline)
-                inked(HeartShape(), fill: Palette.heart)
+                EnvelopeFlapShape().stroke(ink, style: outline)
+                inked(HeartShape(frame: CGRect(x: 0.35, y: 0.41, width: 0.30, height: 0.33)), fill: Palette.heart)
             }
             .rotationEffect(.degrees(-8))
         case .moon:
             ZStack {
                 inked(MoonShape(), fill: Palette.moon)
                 FaceShape(eyes: [CGPoint(x: 0.24, y: 0.52)], mouth: CGPoint(x: 0.34, y: 0.68))
-                    .stroke(Palette.outline, style: featureLine)
+                    .stroke(ink, style: featureLine)
             }
             .rotationEffect(.degrees(-12))
+        case .heart:
+            inked(HeartShape(frame: CGRect(x: 0.06, y: 0.1, width: 0.88, height: 0.8)), fill: Palette.heart)
+                .rotationEffect(.degrees(-10))
+        case .puppy:
+            ZStack {
+                inked(PuppyEarsShape(), fill: Palette.ear)
+                inked(PuppyHeadShape(), fill: .white)
+                PuppyFeaturesShape().fill(ink)
+                PuppyMouthShape().stroke(ink, style: featureLine)
+            }
         }
+    }
+
+    private var ink: Color {
+        lineArt ? .primary : Palette.outline
     }
 
     private var outline: StrokeStyle {
@@ -57,26 +74,113 @@ struct Doodle: View {
         StrokeStyle(lineWidth: max(0.9, size * 0.05), lineCap: .round, lineJoin: .round)
     }
 
+    @ViewBuilder
     private func inked<S: Shape>(_ shape: S, fill: Color) -> some View {
-        shape
-            .fill(fill)
-            .overlay(shape.stroke(Palette.outline, style: outline))
+        if lineArt {
+            shape.stroke(ink, style: outline)
+        } else {
+            shape
+                .fill(fill)
+                .overlay(shape.stroke(ink, style: outline))
+        }
+    }
+}
+
+/// Setlog's paper covered in faint pencil doodles, with a hand-drawn pink frame around the edge.
+/// Content sits on top.
+struct DoodlePaper: View {
+    private struct Mark {
+        let kind: Doodle.Kind
+        /// Center, as a fraction of the widget's width and height.
+        let x: CGFloat
+        let y: CGFloat
+        let size: CGFloat
+        let degrees: Double
+    }
+
+    private static let marks: [Mark] = [
+        Mark(kind: .star, x: 0.05, y: 0.14, size: 18, degrees: -12),
+        Mark(kind: .heart, x: 0.37, y: 0.07, size: 14, degrees: 10),
+        Mark(kind: .sparkle, x: 0.70, y: 0.09, size: 11, degrees: 0),
+        Mark(kind: .flame, x: 0.94, y: 0.30, size: 16, degrees: 8),
+        Mark(kind: .envelope, x: 0.07, y: 0.56, size: 16, degrees: -10),
+        Mark(kind: .star, x: 0.31, y: 0.36, size: 12, degrees: 14),
+        Mark(kind: .sparkle, x: 0.49, y: 0.50, size: 9, degrees: 0),
+        Mark(kind: .heart, x: 0.79, y: 0.56, size: 12, degrees: -14),
+        Mark(kind: .sparkle, x: 0.22, y: 0.90, size: 12, degrees: 0),
+        Mark(kind: .moon, x: 0.55, y: 0.93, size: 16, degrees: -8),
+        Mark(kind: .sparkle, x: 0.63, y: 0.71, size: 10, degrees: 0),
+        Mark(kind: .puppy, x: 0.92, y: 0.82, size: 18, degrees: -6),
+    ]
+
+    var body: some View {
+        GeometryReader { geometry in
+            ZStack {
+                Palette.paper
+                ZStack {
+                    ForEach(Self.marks.indices, id: \.self) { index in
+                        let mark = Self.marks[index]
+                        Doodle(kind: mark.kind, size: mark.size)
+                            .rotationEffect(.degrees(mark.degrees))
+                            .position(x: mark.x * geometry.size.width, y: mark.y * geometry.size.height)
+                    }
+                }
+                .compositingGroup()
+                .grayscale(1)
+                .opacity(0.16)
+                SketchRoundedRect(cornerRadius: 20, wobble: 1.4, seed: 3)
+                    .stroke(Palette.pink, style: StrokeStyle(lineWidth: 3, lineCap: .round))
+                    .padding(6)
+            }
+        }
+    }
+}
+
+extension View {
+    /// A pill with a hand-inked edge, like a sticker label.
+    func sketchPill() -> some View {
+        background(Palette.pill, in: Capsule())
+            .overlay(SketchRoundedRect(wobble: 0.8, seed: 5).stroke(Palette.ink, lineWidth: 1.2))
+    }
+}
+
+// MARK: - Wobble
+
+/// Nudges points by a small, repeatable amount so lines look drawn by hand rather than ruled.
+/// The same seed always gives the same wobble, so outlines don't shimmer between renders.
+private struct Wobble {
+    private let seed: Double
+    private let amount: CGFloat
+    private var count = 0.0
+
+    init(seed: Double, amount: CGFloat) {
+        self.seed = seed
+        self.amount = amount
+    }
+
+    mutating func nudge(_ point: CGPoint) -> CGPoint {
+        count += 1
+        return CGPoint(x: point.x + noise(count) * amount, y: point.y + noise(count + 0.37) * amount)
+    }
+
+    /// A repeatable value in -1...1.
+    private func noise(_ n: Double) -> CGFloat {
+        let value = sin((seed + n) * 12.9898) * 43758.5453
+        return CGFloat(value - value.rounded(.down)) * 2 - 1
     }
 }
 
 // MARK: - Pen
 
-/// Plots unit-square coordinates into a rect with a small, repeatable jitter so strokes look
-/// drawn by hand rather than ruled. The same seed always gives the same wobble.
+/// Plots unit-square coordinates into a rect, wobbling each point a little.
 private struct Pen {
     private let rect: CGRect
-    private let seed: Double
-    private var count = 0.0
+    private var wobble: Wobble
     private(set) var path = Path()
 
     init(_ rect: CGRect, seed: Double) {
         self.rect = rect
-        self.seed = seed
+        wobble = Wobble(seed: seed, amount: 0.02 * min(rect.width, rect.height))
     }
 
     mutating func move(_ x: CGFloat, _ y: CGFloat) {
@@ -101,20 +205,63 @@ private struct Pen {
     }
 
     private mutating func point(_ x: CGFloat, _ y: CGFloat) -> CGPoint {
-        count += 1
-        let amount = 0.02 * min(rect.width, rect.height)
-        return CGPoint(x: rect.minX + x * rect.width + noise(count) * amount,
-                       y: rect.minY + y * rect.height + noise(count + 0.37) * amount)
-    }
-
-    /// A repeatable value in -1...1.
-    private func noise(_ n: Double) -> CGFloat {
-        let value = sin((seed + n) * 12.9898) * 43758.5453
-        return CGFloat(value - value.rounded(.down)) * 2 - 1
+        wobble.nudge(CGPoint(x: rect.minX + x * rect.width, y: rect.minY + y * rect.height))
     }
 }
 
-// MARK: - Shapes
+// MARK: - Hand-drawn outlines
+
+/// A rounded rectangle drawn freehand: edges bow slightly, and the line runs a little past
+/// where it started, the way a pen does. Leave `cornerRadius` nil for a capsule.
+struct SketchRoundedRect: Shape {
+    var cornerRadius: CGFloat?
+    var wobble: CGFloat
+    var seed: Double
+
+    func path(in rect: CGRect) -> Path {
+        let radius = min(cornerRadius ?? .infinity, min(rect.width, rect.height) / 2)
+        let overshoot = min(12, rect.width * 0.12)
+        var jitter = Wobble(seed: seed, amount: wobble)
+        var path = Path()
+
+        func edge(to end: CGPoint) {
+            let start = path.currentPoint ?? end
+            let middle = CGPoint(x: (start.x + end.x) / 2, y: (start.y + end.y) / 2)
+            path.addQuadCurve(to: jitter.nudge(end), control: jitter.nudge(middle))
+        }
+
+        func corner(to end: CGPoint, control: CGPoint) {
+            path.addQuadCurve(to: jitter.nudge(end), control: control)
+        }
+
+        path.move(to: jitter.nudge(CGPoint(x: rect.minX + radius, y: rect.minY)))
+        edge(to: CGPoint(x: rect.maxX - radius, y: rect.minY))
+        corner(to: CGPoint(x: rect.maxX, y: rect.minY + radius), control: CGPoint(x: rect.maxX, y: rect.minY))
+        edge(to: CGPoint(x: rect.maxX, y: rect.maxY - radius))
+        corner(to: CGPoint(x: rect.maxX - radius, y: rect.maxY), control: CGPoint(x: rect.maxX, y: rect.maxY))
+        edge(to: CGPoint(x: rect.minX + radius, y: rect.maxY))
+        corner(to: CGPoint(x: rect.minX, y: rect.maxY - radius), control: CGPoint(x: rect.minX, y: rect.maxY))
+        edge(to: CGPoint(x: rect.minX, y: rect.minY + radius))
+        corner(to: CGPoint(x: rect.minX + radius, y: rect.minY), control: CGPoint(x: rect.minX, y: rect.minY))
+        edge(to: CGPoint(x: rect.minX + radius + overshoot, y: rect.minY))
+        return path
+    }
+}
+
+/// A loopy freehand line, for underlining.
+struct SquiggleShape: Shape {
+    func path(in rect: CGRect) -> Path {
+        var pen = Pen(rect, seed: 9)
+        pen.move(0.01, 0.6)
+        pen.curve(0.26, 0.5, 0.08, 0.1, 0.18, 0.95)
+        pen.curve(0.51, 0.5, 0.33, 0.05, 0.43, 0.95)
+        pen.curve(0.76, 0.5, 0.58, 0.05, 0.68, 0.95)
+        pen.curve(0.99, 0.4, 0.83, 0.05, 0.93, 0.7)
+        return pen.path
+    }
+}
+
+// MARK: - Sticker shapes
 
 private struct SparkleShape: Shape {
     func path(in rect: CGRect) -> Path {
@@ -216,14 +363,19 @@ private struct EnvelopeFlapShape: Shape {
     }
 }
 
+/// A heart drawn inside `frame`, given in unit coordinates of the doodle.
 private struct HeartShape: Shape {
+    let frame: CGRect
+
     func path(in rect: CGRect) -> Path {
-        var pen = Pen(rect, seed: 8)
-        pen.move(0.5, 0.74)
-        pen.curve(0.35, 0.53, 0.42, 0.68, 0.35, 0.62)
-        pen.curve(0.5, 0.49, 0.35, 0.43, 0.46, 0.41)
-        pen.curve(0.65, 0.53, 0.54, 0.41, 0.65, 0.43)
-        pen.curve(0.5, 0.74, 0.65, 0.62, 0.58, 0.68)
+        let inner = CGRect(x: rect.minX + frame.minX * rect.width, y: rect.minY + frame.minY * rect.height,
+                           width: frame.width * rect.width, height: frame.height * rect.height)
+        var pen = Pen(inner, seed: 8)
+        pen.move(0.5, 1.0)
+        pen.curve(0, 0.36, 0.23, 0.82, 0, 0.64)
+        pen.curve(0.5, 0.24, 0, 0.06, 0.37, 0)
+        pen.curve(1, 0.36, 0.63, 0, 1, 0.06)
+        pen.curve(0.5, 1.0, 1, 0.64, 0.77, 0.82)
         pen.close()
         return pen.path
     }
@@ -237,5 +389,58 @@ private struct MoonShape: Shape {
         let bite = Path(ellipseIn: CGRect(x: rect.minX + rect.width * 0.38, y: rect.minY - rect.height * 0.02,
                                           width: rect.width * 0.72, height: rect.height * 0.72))
         return full.subtracting(bite)
+    }
+}
+
+private struct PuppyEarsShape: Shape {
+    func path(in rect: CGRect) -> Path {
+        var pen = Pen(rect, seed: 12)
+        pen.move(0.32, 0.28)
+        pen.curve(0.08, 0.64, 0.16, 0.24, 0.04, 0.46)
+        pen.curve(0.30, 0.60, 0.12, 0.78, 0.26, 0.74)
+        pen.close()
+        pen.move(0.68, 0.28)
+        pen.curve(0.92, 0.64, 0.84, 0.24, 0.96, 0.46)
+        pen.curve(0.70, 0.60, 0.88, 0.78, 0.74, 0.74)
+        pen.close()
+        return pen.path
+    }
+}
+
+private struct PuppyHeadShape: Shape {
+    func path(in rect: CGRect) -> Path {
+        var pen = Pen(rect, seed: 13)
+        pen.move(0.5, 0.20)
+        pen.curve(0.80, 0.55, 0.70, 0.20, 0.82, 0.36)
+        pen.curve(0.5, 0.88, 0.78, 0.78, 0.64, 0.88)
+        pen.curve(0.20, 0.55, 0.36, 0.88, 0.22, 0.78)
+        pen.curve(0.5, 0.20, 0.18, 0.36, 0.30, 0.20)
+        pen.close()
+        return pen.path
+    }
+}
+
+/// Eyes and nose, filled.
+private struct PuppyFeaturesShape: Shape {
+    func path(in rect: CGRect) -> Path {
+        func dot(_ x: CGFloat, _ y: CGFloat, _ w: CGFloat, _ h: CGFloat) -> CGRect {
+            CGRect(x: rect.minX + (x - w / 2) * rect.width, y: rect.minY + (y - h / 2) * rect.height,
+                   width: w * rect.width, height: h * rect.height)
+        }
+        var path = Path()
+        path.addEllipse(in: dot(0.40, 0.50, 0.07, 0.08))
+        path.addEllipse(in: dot(0.60, 0.50, 0.07, 0.08))
+        path.addEllipse(in: dot(0.50, 0.63, 0.12, 0.08))
+        return path
+    }
+}
+
+private struct PuppyMouthShape: Shape {
+    func path(in rect: CGRect) -> Path {
+        var pen = Pen(rect, seed: 14)
+        pen.move(0.42, 0.71)
+        pen.quad(0.5, 0.70, control: 0.46, 0.77)
+        pen.quad(0.58, 0.71, control: 0.54, 0.77)
+        return pen.path
     }
 }

@@ -17,6 +17,9 @@ build/
 *.dSYM.zip
 *.dSYM
 
+# Personal photos for local demos (the project treats this folder as optional)
+DemoPhotos/
+
 # Swift Package Manager
 .build/
 .swiftpm/

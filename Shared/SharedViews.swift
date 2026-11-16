@@ -22,6 +22,14 @@ enum Palette {
     static let flame = Color(hex: 0xFF8058)
     static let butter = Color(hex: 0xFFE9A0)
     static let moon = Color(hex: 0xFFF6DA)
+    static let ear = Color(hex: 0xE8C49A)
+}
+
+extension Font {
+    /// Gaegu runs small, so sizes here sit a few points above their system-font equivalents.
+    static func hand(_ size: CGFloat, bold: Bool = true) -> Font {
+        .custom(bold ? "Gaegu-Bold" : "Gaegu-Regular", fixedSize: size)
+    }
 }
 
 extension Color {
@@ -46,6 +54,7 @@ extension UIColor {
 }
 
 /// 24 thin bars, one per hour, brighter when more of the group logged that hour.
+/// Each bar leans a little, as if ticked off by hand.
 struct HourBar: View {
     let state: GroupState
     let day: String
@@ -59,6 +68,7 @@ struct HourBar: View {
                 RoundedRectangle(cornerRadius: 1.5)
                     .fill(color.opacity(opacity(hour)))
                     .frame(height: hour == currentHour ? height : height * 0.7)
+                    .rotationEffect(.degrees(Double((hour * 37) % 9 - 4)))
             }
         }
         .frame(height: height, alignment: .bottom)
@@ -99,7 +109,8 @@ struct MomentImage: View {
 }
 
 /// The text Setlog lays over each feed card: the poster's name top-left, and the hour
-/// in a wide, heavy face with the caption underneath, centered.
+/// in a wide, heavy face with the caption underneath, centered. Names and captions are
+/// handwritten, like notes scribbled on a photo.
 struct MomentOverlay: View {
     let moment: Moment
     let name: String
@@ -113,7 +124,7 @@ struct MomentOverlay: View {
                     .font(.system(size: timeSize, weight: .black).width(.expanded))
                 if !moment.caption.isEmpty {
                     Text(moment.caption)
-                        .font(.system(size: timeSize * 0.48, weight: .medium))
+                        .font(.hand(timeSize * 0.66))
                         .lineLimit(1)
                         .minimumScaleFactor(0.8)
                 }
@@ -121,7 +132,7 @@ struct MomentOverlay: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
 
             Text(name)
-                .font(.system(size: timeSize * 0.52, weight: .semibold))
+                .font(.hand(timeSize * 0.72))
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         }
         .foregroundStyle(.white)
@@ -163,7 +174,6 @@ struct ReactionTrail: View {
 struct Avatar: View {
     let friend: Friend
     var size: CGFloat = 22
-    var dimmed = false
 
     var body: some View {
         Text(friend.initial)
@@ -171,7 +181,6 @@ struct Avatar: View {
             .foregroundStyle(.white)
             .frame(width: size, height: size)
             .background(Color(hue: friend.hue, saturation: 0.5, brightness: 0.65), in: Circle())
-            .opacity(dimmed ? 0.35 : 1)
     }
 }
 

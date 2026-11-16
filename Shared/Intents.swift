@@ -20,9 +20,7 @@ struct HeartMomentIntent: AppIntent {
 
     func perform() async throws -> some IntentResult {
         guard let id = UUID(uuidString: momentID) else { return .result() }
-        var state = Store.loadCurrent()
-        state.toggleMyReaction(momentID: id)
-        Store.save(state)
+        Store.update { $0.toggleMyReaction(momentID: id) }
         return .result()
     }
 }
@@ -34,9 +32,8 @@ struct NudgeMissingIntent: AppIntent {
     init() {}
 
     func perform() async throws -> some IntentResult {
-        var state = Store.loadCurrent()
-        state.nudgeEveryoneMissing(at: Date())
-        Store.save(state)
+        let now = Date()
+        Store.update(now: now) { $0.nudgeEveryoneMissing(at: now) }
         return .result()
     }
 }

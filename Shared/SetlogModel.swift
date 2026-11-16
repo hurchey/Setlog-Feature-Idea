@@ -33,7 +33,8 @@ struct Moment: Codable, Hashable, Identifiable {
 /// One Setlog group. In production this lives on Setlog's backend; here it lives in the
 /// shared App Group container so every widget and widget button reads the same thing.
 struct GroupState: Codable {
-    static let maxFriends = 12
+    /// Logs in one hour that make it a busy hour, marked with flames on the widgets.
+    static let busyHourCount = 3
 
     var name: String
     var meID: String
@@ -75,10 +76,6 @@ struct GroupState: Codable {
         Set(moments(day: day, hour: hour).map(\.friendID)).count
     }
 
-    func loggedNames(day: String, hour: Int) -> [String] {
-        friends.filter { hasLogged($0.id, day: day, hour: hour) }.map { name(of: $0.id) }
-    }
-
     /// Friends other than me who haven't logged this hour.
     func missing(day: String, hour: Int) -> [Friend] {
         others.filter { !hasLogged($0.id, day: day, hour: hour) }
@@ -91,6 +88,41 @@ struct GroupState: Codable {
     /// Most recent moment from someone other than me today.
     func latestFriendMoment(day: String) -> Moment? {
         todaysMoments(day: day).first { $0.friendID != meID }
+    }
+
+    /// Today's moments from friends, newest first.
+    func recentFriendMoments(day: String, limit: Int) -> [Moment] {
+        Array(todaysMoments(day: day).filter { $0.friendID != meID }.prefix(limit))
+    }
+
+    // MARK: Small widget's photo loop
+
+    static let loopLength = 6
+    /// Seconds each moment stays up before the loop moves on.
+    static let slideInterval: TimeInterval = 30
+
+    /// The friend a Friend widget follows, by their place in the group; nil means everyone. A group
+    /// with fewer friends than the slot has no one there, so that widget shows everyone's moments.
+    func friendID(inSlot slot: Int?) -> String? {
+        guard let slot, slot < others.count else { return nil }
+        return others[slot].id
+    }
+
+    /// Today's moments for the loop, newest first: one friend's if `friendID` is set, everyone's otherwise.
+    func loopMoments(day: String, friendID: String?) -> [Moment] {
+        let moments = todaysMoments(day: day).filter { moment in
+            moment.friendID != meID && (friendID == nil || moment.friendID == friendID)
+        }
+        return Array(moments.prefix(Self.loopLength))
+    }
+
+    /// Which moment of the loop shows at `date`. Slides count from the newest post, so a new post
+    /// always shows first and the loop moves on by one every `slideInterval`.
+    func loopIndex(at date: Date, friendID: String?) -> Int {
+        let loop = loopMoments(day: SetlogTime.day(for: date), friendID: friendID)
+        guard let newest = loop.first else { return 0 }
+        let steps = Int(max(0, date.timeIntervalSince(newest.createdAt)) / Self.slideInterval)
+        return steps % loop.count
     }
 
     func wasNudgedThisHour(_ friendID: String, now: Date) -> Bool {
@@ -120,13 +152,6 @@ struct GroupState: Codable {
         for friend in missing(day: SetlogTime.day(for: now), hour: SetlogTime.hour(for: now)) {
             nudges[friend.id] = now
         }
-    }
-
-    mutating func addMoment(friendID: String, imageFile: String, at now: Date) {
-        let day = SetlogTime.day(for: now)
-        let hour = SetlogTime.hour(for: now)
-        guard !hasLogged(friendID, day: day, hour: hour) else { return }
-        moments.append(Moment(friendID: friendID, day: day, hour: hour, createdAt: now, imageFile: imageFile))
     }
 
     /// Keeps the shared file small: only today's moments are kept.
@@ -252,8 +277,7 @@ enum SetlogTime {
 // MARK: - Deep links
 
 enum DeepLink {
-    /// Must match the URL scheme on the app target (Info > URL Types).
-    static let scheme = "setlogconcept"
+    /// The `setlogconcept` scheme must match the app target's URL Types (Info > URL Types).
     static let log = URL(string: "setlogconcept://log")!
     /// The day's clips played back to back.
     static let vlog = URL(string: "setlogconcept://vlog")!
