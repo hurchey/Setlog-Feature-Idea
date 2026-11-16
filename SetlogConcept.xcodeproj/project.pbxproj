@@ -13,6 +13,7 @@
 		1C4327745774BE68BC7DE6D4 /* Gaegu-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A1F70785F0D0E200E29D2550 /* Gaegu-Regular.ttf */; };
 		22421E9758C2288709937591 /* DemoPhotos in Resources */ = {isa = PBXBuildFile; fileRef = 61B5AF527EB1F415C9C1B78C /* DemoPhotos */; };
 		2FF09752B382BF8F1A650D2F /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6FB912A4DEB7F6E043FABB80 /* Localizable.strings */; };
+		42EC376C186C6528549ED4FA /* HourStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72A89B707D937837DE37F426 /* HourStatus.swift */; };
 		46A3FA616F8DC1E22E1ED924 /* SharedViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA9C271C5A241403544A2335 /* SharedViews.swift */; };
 		552DBD25486176B59624AFB8 /* DemoPhotos in Resources */ = {isa = PBXBuildFile; fileRef = 61B5AF527EB1F415C9C1B78C /* DemoPhotos */; };
 		5AC7CE5E7B97A47C3E2B269B /* SetlogModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C89801EC3CAB874195D8F4A /* SetlogModel.swift */; };
@@ -21,8 +22,10 @@
 		691A7A7A38D63324E7858C30 /* SetlogWidgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 781F2199FC06D10B20FF8C07 /* SetlogWidgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		6D6B2C6E16346A4F4C16D4A3 /* Gaegu-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A1F70785F0D0E200E29D2550 /* Gaegu-Regular.ttf */; };
 		71C7DDB32013FB2A01AACDAE /* SetlogConceptApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F39770B30B034741D7D340E4 /* SetlogConceptApp.swift */; };
+		79256291F3ADAB1B421D8DBD /* HourStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72A89B707D937837DE37F426 /* HourStatus.swift */; };
 		7CF9EC73C30249C3B3A9957E /* Doodles.swift in Sources */ = {isa = PBXBuildFile; fileRef = 177B51CB61CCF8001F18C838 /* Doodles.swift */; };
 		824A260AD290F8208825B448 /* Store.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD9D2E7FF3F150A71D8A9C1C /* Store.swift */; };
+		96593DAF0FC7C0E5A7A866CF /* HourStatusTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46B3EEE4AB9C6DE6D4B9C318 /* HourStatusTests.swift */; };
 		C1FB5B2A9F59DFD5BFF7CAC2 /* OFL.txt in Resources */ = {isa = PBXBuildFile; fileRef = 1E61512A36B6A33BEE4D851C /* OFL.txt */; };
 		C4C0FC70A2CAAE5719E0F6A0 /* Intents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56F8EEDC18E0AACE51E7B821 /* Intents.swift */; };
 		D277486C1D27E3F271029E6C /* SetlogModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C89801EC3CAB874195D8F4A /* SetlogModel.swift */; };
@@ -32,6 +35,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		3B398DCBC2652AB10CD68304 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CFBE3103A9A166545380BEFF /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = BEFE78EC7283C0C224B67F90;
+			remoteInfo = SetlogConcept;
+		};
 		F3CEF20AED28EA42898F087E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = CFBE3103A9A166545380BEFF /* Project object */;
@@ -60,13 +70,16 @@
 		177B51CB61CCF8001F18C838 /* Doodles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Doodles.swift; sourceTree = "<group>"; };
 		1C89801EC3CAB874195D8F4A /* SetlogModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetlogModel.swift; sourceTree = "<group>"; };
 		1E61512A36B6A33BEE4D851C /* OFL.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = OFL.txt; sourceTree = "<group>"; };
+		46B3EEE4AB9C6DE6D4B9C318 /* HourStatusTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HourStatusTests.swift; sourceTree = "<group>"; };
 		52338F1C3010BD371DD501F3 /* Gaegu-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Gaegu-Bold.ttf"; sourceTree = "<group>"; };
 		56F8EEDC18E0AACE51E7B821 /* Intents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Intents.swift; sourceTree = "<group>"; };
 		61B5AF527EB1F415C9C1B78C /* DemoPhotos */ = {isa = PBXFileReference; lastKnownFileType = folder; path = DemoPhotos; sourceTree = SOURCE_ROOT; };
 		6F9F19BA5746EB38437B15CB /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		72A89B707D937837DE37F426 /* HourStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HourStatus.swift; sourceTree = "<group>"; };
 		781F2199FC06D10B20FF8C07 /* SetlogWidgets.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = SetlogWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1F70785F0D0E200E29D2550 /* Gaegu-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Gaegu-Regular.ttf"; sourceTree = "<group>"; };
 		BA9C271C5A241403544A2335 /* SharedViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedViews.swift; sourceTree = "<group>"; };
+		DBCAFBDD511F431E156E0BF7 /* SetlogConceptTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = SetlogConceptTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DBEFE7693B02537016DC6C25 /* SetlogConcept.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = SetlogConcept.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DD9D2E7FF3F150A71D8A9C1C /* Store.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Store.swift; sourceTree = "<group>"; };
 		EA687B896EB25E2C6CCAF6B3 /* SetlogWidgets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetlogWidgets.swift; sourceTree = "<group>"; };
@@ -84,12 +97,21 @@
 			path = Fonts;
 			sourceTree = "<group>";
 		};
+		3FB4E065DD96E6F088855BF8 /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				46B3EEE4AB9C6DE6D4B9C318 /* HourStatusTests.swift */,
+			);
+			path = Tests;
+			sourceTree = "<group>";
+		};
 		48D7ECB481E002ADB3235F32 = {
 			isa = PBXGroup;
 			children = (
 				61B5AF527EB1F415C9C1B78C /* DemoPhotos */,
 				915D63B5234EF70D9AB08B93 /* App */,
 				D9D253639DFE965CCD01057B /* Shared */,
+				3FB4E065DD96E6F088855BF8 /* Tests */,
 				ADA235E03E0EC143E6456B17 /* Widgets */,
 				F403639CAAD79F73FB2226C4 /* Products */,
 			);
@@ -115,6 +137,7 @@
 		D9D253639DFE965CCD01057B /* Shared */ = {
 			isa = PBXGroup;
 			children = (
+				72A89B707D937837DE37F426 /* HourStatus.swift */,
 				56F8EEDC18E0AACE51E7B821 /* Intents.swift */,
 				1C89801EC3CAB874195D8F4A /* SetlogModel.swift */,
 				BA9C271C5A241403544A2335 /* SharedViews.swift */,
@@ -129,6 +152,7 @@
 			isa = PBXGroup;
 			children = (
 				DBEFE7693B02537016DC6C25 /* SetlogConcept.app */,
+				DBCAFBDD511F431E156E0BF7 /* SetlogConceptTests.xctest */,
 				781F2199FC06D10B20FF8C07 /* SetlogWidgets.appex */,
 			);
 			name = Products;
@@ -137,6 +161,24 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		3426E97E4C2E04D610627347 /* SetlogConceptTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CB9501FCCA69F176834518CC /* Build configuration list for PBXNativeTarget "SetlogConceptTests" */;
+			buildPhases = (
+				CAB3D2E4FC0B57E585FE8E6E /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				0886E4FFC607D59B47BBCE28 /* PBXTargetDependency */,
+			);
+			name = SetlogConceptTests;
+			packageProductDependencies = (
+			);
+			productName = SetlogConceptTests;
+			productReference = DBCAFBDD511F431E156E0BF7 /* SetlogConceptTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		8138FADFE49866F7499D0D04 /* SetlogWidgets */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = B42F15720E15F2F51091961A /* Build configuration list for PBXNativeTarget "SetlogWidgets" */;
@@ -184,6 +226,9 @@
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
+					3426E97E4C2E04D610627347 = {
+						ProvisioningStyle = Automatic;
+					};
 					8138FADFE49866F7499D0D04 = {
 						ProvisioningStyle = Automatic;
 					};
@@ -209,6 +254,7 @@
 			targets = (
 				BEFE78EC7283C0C224B67F90 /* SetlogConcept */,
 				8138FADFE49866F7499D0D04 /* SetlogWidgets */,
+				3426E97E4C2E04D610627347 /* SetlogConceptTests */,
 			);
 		};
 /* End PBXProject section */
@@ -246,6 +292,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7CF9EC73C30249C3B3A9957E /* Doodles.swift in Sources */,
+				42EC376C186C6528549ED4FA /* HourStatus.swift in Sources */,
 				C4C0FC70A2CAAE5719E0F6A0 /* Intents.swift in Sources */,
 				5AC7CE5E7B97A47C3E2B269B /* SetlogModel.swift in Sources */,
 				0B9736AF7322157F58A99128 /* SetlogWidgets.swift in Sources */,
@@ -254,10 +301,19 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		CAB3D2E4FC0B57E585FE8E6E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				96593DAF0FC7C0E5A7A866CF /* HourStatusTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E703642F47FB7F058770A677 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				79256291F3ADAB1B421D8DBD /* HourStatus.swift in Sources */,
 				19361C9EF97F65069127C367 /* Intents.swift in Sources */,
 				71C7DDB32013FB2A01AACDAE /* SetlogConceptApp.swift in Sources */,
 				D277486C1D27E3F271029E6C /* SetlogModel.swift in Sources */,
@@ -269,6 +325,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		0886E4FFC607D59B47BBCE28 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = BEFE78EC7283C0C224B67F90 /* SetlogConcept */;
+			targetProxy = 3B398DCBC2652AB10CD68304 /* PBXContainerItemProxy */;
+		};
 		8C20E89B36A99A7B238B8888 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 8138FADFE49866F7499D0D04 /* SetlogWidgets */;
@@ -303,6 +364,23 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.erichurchey.SetlogConcept;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		721A25E2EF64D1C88259DAEB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.erichurchey.SetlogConceptTests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SetlogConcept.app/SetlogConcept";
 			};
 			name = Debug;
 		};
@@ -399,6 +477,23 @@
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
+		};
+		94D0A586E4A7082E0BA5027F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.erichurchey.SetlogConceptTests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SetlogConcept.app/SetlogConcept";
+			};
+			name = Release;
 		};
 		BFFA4599EC489E708F12F5DA /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -501,6 +596,15 @@
 			buildConfigurations = (
 				93CA3D8384C37962934272C0 /* Debug */,
 				755A876A6B5DECA1A7111EF3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		CB9501FCCA69F176834518CC /* Build configuration list for PBXNativeTarget "SetlogConceptTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				721A25E2EF64D1C88259DAEB /* Debug */,
+				94D0A586E4A7082E0BA5027F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

@@ -53,20 +53,21 @@ extension UIColor {
     }
 }
 
-/// 24 thin bars, one per hour, brighter when more of the group logged that hour.
+/// Today's 24 hours as thin bars, brighter when more of the group logged that hour.
 /// Each bar leans a little, as if ticked off by hand.
-struct HourBar: View {
-    let state: GroupState
-    let day: String
+struct DayBar: View {
+    /// How many of the group logged in each hour.
+    let loggedByHour: [Int]
+    let groupSize: Int
     var currentHour: Int?
     var height: CGFloat = 16
     var color: Color = .primary
 
     var body: some View {
         HStack(spacing: 2) {
-            ForEach(0..<24, id: \.self) { hour in
+            ForEach(loggedByHour.indices, id: \.self) { hour in
                 RoundedRectangle(cornerRadius: 1.5)
-                    .fill(color.opacity(opacity(hour)))
+                    .fill(color.opacity(opacity(loggedByHour[hour])))
                     .frame(height: hour == currentHour ? height : height * 0.7)
                     .rotationEffect(.degrees(Double((hour * 37) % 9 - 4)))
             }
@@ -74,10 +75,9 @@ struct HourBar: View {
         .frame(height: height, alignment: .bottom)
     }
 
-    private func opacity(_ hour: Int) -> Double {
-        let count = state.loggedCount(day: day, hour: hour)
+    private func opacity(_ count: Int) -> Double {
         guard count > 0 else { return 0.15 }
-        return 0.35 + 0.65 * Double(count) / Double(max(state.friends.count, 1))
+        return 0.35 + 0.65 * Double(count) / Double(max(groupSize, 1))
     }
 }
 

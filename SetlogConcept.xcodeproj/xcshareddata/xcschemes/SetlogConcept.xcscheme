@@ -39,6 +39,17 @@
          </BuildableReference>
       </MacroExpansion>
       <Testables>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "3426E97E4C2E04D610627347"
+               BuildableName = "SetlogConceptTests.xctest"
+               BlueprintName = "SetlogConceptTests"
+               ReferencedContainer = "container:SetlogConcept.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
       <CommandLineArguments>
       </CommandLineArguments>

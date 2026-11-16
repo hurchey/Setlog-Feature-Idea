@@ -33,9 +33,6 @@ struct Moment: Codable, Hashable, Identifiable {
 /// One Setlog group. In production this lives on Setlog's backend; here it lives in the
 /// shared App Group container so every widget and widget button reads the same thing.
 struct GroupState: Codable {
-    /// Logs in one hour that make it a busy hour, marked with flames on the widgets.
-    static let busyHourCount = 3
-
     var name: String
     var meID: String
     var friends: [Friend]
@@ -50,7 +47,6 @@ struct GroupState: Codable {
     /// Demo switch: show the end-of-day recap now instead of waiting for 22:00.
     var previewRecap = false
 
-    var me: Friend? { friends.first { $0.id == meID } }
     var others: [Friend] { friends.filter { $0.id != meID } }
 
     func friend(_ id: String) -> Friend? {
@@ -61,7 +57,7 @@ struct GroupState: Codable {
         id == meID ? String(localized: "You") : (friend(id)?.name ?? String(localized: "Someone"))
     }
 
-    // MARK: Hour status
+    // MARK: Who logged when
 
     func moments(day: String, hour: Int) -> [Moment] {
         moments.filter { $0.day == day && $0.hour == hour }
@@ -123,17 +119,6 @@ struct GroupState: Codable {
         guard let newest = loop.first else { return 0 }
         let steps = Int(max(0, date.timeIntervalSince(newest.createdAt)) / Self.slideInterval)
         return steps % loop.count
-    }
-
-    func wasNudgedThisHour(_ friendID: String, now: Date) -> Bool {
-        guard let date = nudges[friendID] else { return false }
-        return SetlogTime.day(for: date) == SetlogTime.day(for: now)
-            && SetlogTime.hour(for: date) == SetlogTime.hour(for: now)
-    }
-
-    func everyoneMissingNudged(now: Date) -> Bool {
-        let missing = missing(day: SetlogTime.day(for: now), hour: SetlogTime.hour(for: now))
-        return !missing.isEmpty && missing.allSatisfy { wasNudgedThisHour($0.id, now: now) }
     }
 
     // MARK: Actions
@@ -261,16 +246,6 @@ enum SetlogTime {
     /// Setlog labels each hourly window by its start on a 24-hour clock, like "15:00".
     static func clock(for hour: Int) -> String {
         String(format: "%02d:00", hour)
-    }
-
-    /// 23:00 through 04:59.
-    static func isLateNight(_ hour: Int) -> Bool {
-        hour >= 23 || hour < 5
-    }
-
-    /// From 22:00 the large widget wraps up the day.
-    static func isRecapHour(_ hour: Int) -> Bool {
-        hour >= 22
     }
 }
 

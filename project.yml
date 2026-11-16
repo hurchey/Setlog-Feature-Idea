@@ -52,7 +52,9 @@ targets:
       properties:
         com.apple.security.application-groups:
           - group.com.example.setlogconcept
-    scheme: {}
+    scheme:
+      testTargets:
+        - SetlogConceptTests
 
   SetlogWidgets:
     type: app-extension
@@ -81,3 +83,16 @@ targets:
       properties:
         com.apple.security.application-groups:
           - group.com.example.setlogconcept
+
+  # Swift Testing, hosted in the app so tests can reach the shared code.
+  SetlogConceptTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - Tests
+    dependencies:
+      - target: SetlogConcept
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        PRODUCT_BUNDLE_IDENTIFIER: com.erichurchey.SetlogConceptTests

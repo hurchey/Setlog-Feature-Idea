@@ -24,9 +24,6 @@ struct SetlogEntry: TimelineEntry {
     var friendID: String?
 
     var day: String { SetlogTime.day(for: date) }
-    var hour: Int { SetlogTime.hour(for: date) }
-    var hourEnds: Date { SetlogTime.startOfNextHour(after: date) }
-    var hourStarts: Date { SetlogTime.startOfHour(for: date) }
 }
 
 /// Timelines shared by the Home Screen and Lock Screen widgets.
@@ -153,17 +150,18 @@ struct GroupWidgetView: View {
 
     var body: some View {
         if let state = entry.state {
+            let status = HourStatus(group: state, at: entry.date)
             switch family {
             case .systemSmall:
-                small(state)
-            case .systemLarge where state.previewRecap || SetlogTime.isRecapHour(entry.hour):
-                recap(state)
+                small(state, status: status)
+            case .systemLarge where status.showsRecap:
+                recap(state, status: status)
                     .containerBackground(for: .widget) { DoodlePaper() }
             case .systemLarge:
-                large(state)
+                large(state, status: status)
                     .containerBackground(for: .widget) { DoodlePaper() }
             default:
-                medium(state)
+                medium(state, status: status)
                     .containerBackground(for: .widget) { DoodlePaper() }
             }
         } else {
@@ -175,11 +173,10 @@ struct GroupWidgetView: View {
     }
 
     // Moments fade in place rather than slide, so only a swipe through the stack changes friends.
-    private func small(_ state: GroupState) -> some View {
+    private func small(_ state: GroupState, status: HourStatus) -> some View {
         let loop = state.loopMoments(day: entry.day, friendID: entry.friendID)
         let moment = loop.isEmpty ? nil : loop[state.loopIndex(at: entry.date, friendID: entry.friendID)]
         let followed = entry.friendID.flatMap { state.friend($0) }
-        let logged = state.loggedCount(day: entry.day, hour: entry.hour)
         return ZStack {
             if let moment {
                 // Bottom padding lifts the hour and caption clear of the pill and reaction trail.
@@ -199,9 +196,9 @@ struct GroupWidgetView: View {
             }
             HStack(alignment: .bottom) {
                 HStack(spacing: 3) {
-                    Text("\(logged)/\(state.friends.count) in")
-                        .contentTransition(.numericText(value: Double(logged)))
-                    statusDoodles(logged: logged, size: 13)
+                    Text("\(status.logged)/\(status.groupSize) in")
+                        .contentTransition(.numericText(value: Double(status.logged)))
+                    statusDoodles(status, size: 13)
                 }
                 .font(.hand(14))
                 .foregroundStyle(Palette.ink)
@@ -237,10 +234,8 @@ struct GroupWidgetView: View {
 
     // Medium: the two latest moments as tilted, stacked feed cards on Setlog's paper
     // background, with the hour's status beside them.
-    private func medium(_ state: GroupState) -> some View {
+    private func medium(_ state: GroupState, status: HourStatus) -> some View {
         let recent = state.recentFriendMoments(day: entry.day, limit: 2)
-        let logged = state.loggedCount(day: entry.day, hour: entry.hour)
-        let meLogged = state.hasLogged(state.meID, day: entry.day, hour: entry.hour)
 
         return HStack(spacing: 14) {
             ZStack {
@@ -271,27 +266,28 @@ struct GroupWidgetView: View {
                 groupPill(state.name)
 
                 HStack(spacing: 3) {
-                    Text("\(SetlogTime.clock(for: entry.hour)) · \(logged)/\(state.friends.count) logged")
+                    Text("\(status.clock) · \(status.logged)/\(status.groupSize) logged")
                         .font(.hand(14))
                         .foregroundStyle(Palette.muted)
-                        .contentTransition(.numericText(value: Double(logged)))
-                    statusDoodles(logged: logged, size: 13)
+                        .contentTransition(.numericText(value: Double(status.logged)))
+                    statusDoodles(status, size: 13)
                 }
 
                 HStack(alignment: .firstTextBaseline, spacing: 5) {
-                    Text(meLogged ? "Next in" : "Log in")
+                    Text(status.isYourDeadline ? "Log in" : "Next in")
                         .font(.hand(14))
                         .foregroundStyle(Palette.muted)
-                    Text(timerInterval: entry.hourStarts...entry.hourEnds, countsDown: true)
+                    Text(timerInterval: status.countdown, countsDown: true)
                         .font(.system(size: 22, weight: .black).width(.expanded))
                         .monospacedDigit()
                         .widgetAccentable()
                 }
 
-                HourBar(state: state, day: entry.day, currentHour: entry.hour, height: 10, color: Palette.purple)
+                DayBar(loggedByHour: status.loggedByHour, groupSize: status.groupSize, currentHour: status.hour,
+                       height: 10, color: Palette.purple)
 
                 Spacer(minLength: 0)
-                hourAction(state: state)
+                hourAction(status)
             }
             .foregroundStyle(Palette.ink)
         }
@@ -304,21 +300,19 @@ struct GroupWidgetView: View {
 
     // Large: Setlog's feed, the three latest moments as staggered, tilted cards, with the
     // hour's status above and the countdown and nudge below. Sized for the Today View.
-    private func large(_ state: GroupState) -> some View {
+    private func large(_ state: GroupState, status: HourStatus) -> some View {
         let recent = state.recentFriendMoments(day: entry.day, limit: 3)
-        let logged = state.loggedCount(day: entry.day, hour: entry.hour)
-        let meLogged = state.hasLogged(state.meID, day: entry.day, hour: entry.hour)
         let stagger: [(x: CGFloat, degrees: Double)] = [(-16, -2.5), (16, 2), (-10, -1.5)]
 
         return VStack(spacing: 10) {
             HStack(spacing: 3) {
                 groupPill(state.name)
                 Spacer(minLength: 8)
-                Text("\(SetlogTime.clock(for: entry.hour)) · \(logged)/\(state.friends.count) logged")
+                Text("\(status.clock) · \(status.logged)/\(status.groupSize) logged")
                     .font(.hand(14))
                     .foregroundStyle(Palette.muted)
-                    .contentTransition(.numericText(value: Double(logged)))
-                statusDoodles(logged: logged, size: 14)
+                    .contentTransition(.numericText(value: Double(status.logged)))
+                statusDoodles(status, size: 14)
             }
 
             VStack(spacing: -6) {
@@ -343,16 +337,17 @@ struct GroupWidgetView: View {
             }
             .frame(maxHeight: .infinity)
 
-            HourBar(state: state, day: entry.day, currentHour: entry.hour, height: 10, color: Palette.purple)
+            DayBar(loggedByHour: status.loggedByHour, groupSize: status.groupSize, currentHour: status.hour,
+                   height: 10, color: Palette.purple)
 
             HStack {
-                hourAction(state: state)
+                hourAction(status)
                 Spacer(minLength: 8)
                 HStack(alignment: .firstTextBaseline, spacing: 5) {
-                    Text(meLogged ? "Next in" : "Log in")
+                    Text(status.isYourDeadline ? "Log in" : "Next in")
                         .font(.hand(14))
                         .foregroundStyle(Palette.muted)
-                    Text(timerInterval: entry.hourStarts...entry.hourEnds, countsDown: true)
+                    Text(timerInterval: status.countdown, countsDown: true)
                         .font(.system(size: 20, weight: .black).width(.expanded))
                         .monospacedDigit()
                         .widgetAccentable()
@@ -366,7 +361,7 @@ struct GroupWidgetView: View {
 
     // Recap: from 22:00 the large widget turns the day into a scrapbook page of its moments,
     // Setlog's "keep your day as a vlog" at a glance, with a link to play the day back.
-    private func recap(_ state: GroupState) -> some View {
+    private func recap(_ state: GroupState, status: HourStatus) -> some View {
         let today = Array(state.todaysMoments(day: entry.day).reversed())
         let shown = Array(today.suffix(9))
         let columns = Array(repeating: GridItem(.flexible(), spacing: 8), count: 3)
@@ -410,7 +405,7 @@ struct GroupWidgetView: View {
                 }
             }
 
-            HourBar(state: state, day: entry.day, height: 10, color: Palette.purple)
+            DayBar(loggedByHour: status.loggedByHour, groupSize: status.groupSize, height: 10, color: Palette.purple)
 
             HStack(alignment: .bottom) {
                 Link(destination: DeepLink.vlog) {
@@ -478,13 +473,13 @@ struct GroupWidgetView: View {
             }
     }
 
-    /// Flames once the hour gets busy, a moon in the small hours.
+    /// Flames once the hour gets busy, a moon in the small hours; both can show at once.
     @ViewBuilder
-    private func statusDoodles(logged: Int, size: CGFloat) -> some View {
-        if logged >= GroupState.busyHourCount {
+    private func statusDoodles(_ status: HourStatus, size: CGFloat) -> some View {
+        if status.isBusy {
             Doodle(kind: .flame, size: size)
         }
-        if SetlogTime.isLateNight(entry.hour) {
+        if status.isLateNight {
             Doodle(kind: .moon, size: size)
         }
     }
@@ -498,25 +493,25 @@ struct GroupWidgetView: View {
         .buttonStyle(.plain)
     }
 
-    /// What the hour needs next: nudge whoever's missing, or log once everyone else is in.
+    /// What the hour needs from you next, as a button or a note.
     @ViewBuilder
-    private func hourAction(state: GroupState) -> some View {
-        let missing = state.missing(day: entry.day, hour: entry.hour)
-        if missing.isEmpty && state.hasLogged(state.meID, day: entry.day, hour: entry.hour) {
+    private func hourAction(_ status: HourStatus) -> some View {
+        switch status.action {
+        case .everyoneIn:
             HStack(spacing: 5) {
                 Doodle(kind: .star, size: 20)
                 Text("Everyone's in")
                     .font(.hand(14))
             }
-        } else if missing.isEmpty {
-            // Everyone else is in, so the only thing left is my log. Opens Setlog's camera.
+        case .log:
+            // Opens Setlog's camera in production.
             Link(destination: DeepLink.log) {
                 HStack(spacing: 4) {
                     Doodle(kind: .star, size: 20)
                     HStack(spacing: 4) {
                         Image(systemName: "camera.fill")
                             .font(.system(size: 10, weight: .semibold))
-                        Text("Log \(SetlogTime.clock(for: entry.hour))")
+                        Text("Log \(status.clock)")
                             .font(.hand(14))
                     }
                     .padding(.horizontal, 9)
@@ -524,15 +519,14 @@ struct GroupWidgetView: View {
                     .sketchPill()
                 }
             }
-        } else if state.everyoneMissingNudged(now: entry.date) {
+        case .nudged(let count):
             HStack(spacing: 5) {
                 Doodle(kind: .envelope, size: 16)
-                Text("Nudged \(missing.count)")
+                Text("Nudged \(count)")
                     .font(.hand(14))
                     .foregroundStyle(Palette.muted)
             }
-        } else {
-            // Avatars beside a white pill, like Setlog's comment bubbles. A nudge is a little note.
+        case .nudge(let missing):
             Button(intent: NudgeMissingIntent()) {
                 HStack(spacing: 4) {
                     HStack(spacing: -6) {
@@ -577,9 +571,7 @@ struct LockScreenView: View {
 
     var body: some View {
         let state = entry.state ?? .preview
-        let logged = state.loggedCount(day: entry.day, hour: entry.hour)
-        let total = state.friends.count
-        let meLogged = state.hasLogged(state.meID, day: entry.day, hour: entry.hour)
+        let status = HourStatus(group: state, at: entry.date)
 
         switch family {
         case .accessoryCircular:
@@ -590,22 +582,22 @@ struct LockScreenView: View {
                     .stroke(.primary.opacity(0.25), style: StrokeStyle(lineWidth: 4, lineCap: .round))
                     .padding(4)
                 SketchRoundedRect(wobble: 0.8, seed: 21)
-                    .trim(from: 0, to: Double(logged) / Double(max(total, 1)))
+                    .trim(from: 0, to: Double(status.logged) / Double(max(status.groupSize, 1)))
                     .stroke(.primary, style: StrokeStyle(lineWidth: 4, lineCap: .round))
                     .padding(4)
                     .widgetAccentable()
                 VStack(spacing: -2) {
-                    Doodle(kind: hourDoodle(state: state, logged: logged, meLogged: meLogged), size: 15, lineArt: true)
-                    Text("\(logged)/\(total)")
+                    Doodle(kind: hourDoodle(status), size: 15, lineArt: true)
+                    Text("\(status.logged)/\(status.groupSize)")
                         .font(.hand(17))
                 }
             }
 
         case .accessoryInline:
             if let latest = state.latestFriendMoment(day: entry.day) {
-                Text("\(state.name(of: latest.friendID)) posted · \(logged)/\(total) in")
+                Text("\(state.name(of: latest.friendID)) posted · \(status.logged)/\(status.groupSize) in")
             } else {
-                Text("\(SetlogTime.clock(for: entry.hour)) · \(logged)/\(total) logged")
+                Text("\(status.clock) · \(status.logged)/\(status.groupSize) logged")
             }
 
         default:
@@ -619,23 +611,23 @@ struct LockScreenView: View {
                         Text(latest.createdAt, style: .relative)
                             .font(.hand(12, bold: false))
                     } else {
-                        Text("Setlog · \(SetlogTime.clock(for: entry.hour))")
+                        Text("Setlog · \(status.clock)")
                             .font(.hand(16))
                             .widgetAccentable()
                     }
                     Spacer(minLength: 0)
-                    Doodle(kind: hourDoodle(state: state, logged: logged, meLogged: meLogged), size: 18, lineArt: true)
+                    Doodle(kind: hourDoodle(status), size: 18, lineArt: true)
                         .widgetAccentable()
                 }
-                Text(meLogged
-                     ? "\(SetlogTime.clock(for: entry.hour)) · you + \(max(logged - 1, 0)) logged"
-                     : "\(SetlogTime.clock(for: entry.hour)) · \(logged)/\(total) logged")
+                Text(status.youLogged
+                     ? "\(status.clock) · you + \(status.friendsLogged) logged"
+                     : "\(status.clock) · \(status.logged)/\(status.groupSize) logged")
                     .font(.hand(14))
                 HStack(spacing: 3) {
-                    Text(timerInterval: entry.hourStarts...entry.hourEnds, countsDown: true)
+                    Text(timerInterval: status.countdown, countsDown: true)
                         .font(.system(size: 13, weight: .bold, design: .rounded))
                         .monospacedDigit()
-                    Text(meLogged ? "to next log" : "left to log")
+                    Text(status.isYourDeadline ? "left to log" : "to next log")
                         .font(.hand(13))
                 }
             }
@@ -644,15 +636,15 @@ struct LockScreenView: View {
         }
     }
 
-    /// The hour's mood: the star when everyone else is in and it's your turn, flames when it's busy,
-    /// the moon late at night, and sparkles otherwise.
-    private func hourDoodle(state: GroupState, logged: Int, meLogged: Bool) -> Doodle.Kind {
-        if !meLogged && state.missing(day: entry.day, hour: entry.hour).isEmpty {
+    /// One doodle for the hour: the star on your turn, flames when it's busy, the moon late at
+    /// night, and sparkles otherwise.
+    private func hourDoodle(_ status: HourStatus) -> Doodle.Kind {
+        if status.isYourTurn {
             return .star
         }
-        if logged >= GroupState.busyHourCount {
+        if status.isBusy {
             return .flame
         }
-        return SetlogTime.isLateNight(entry.hour) ? .moon : .sparkle
+        return status.isLateNight ? .moon : .sparkle
     }
 }
